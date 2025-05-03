@@ -1,2 +1,2 @@
-Project Under Supervision of Mrs Dr.Imene Ouali
+Project of MediAssist
 Thank you!
