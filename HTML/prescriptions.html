@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prescriptions - MediAssist</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../CSS/global_styles.css">
+    <link rel="stylesheet" href="../CSS/dark-mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Page-specific styles */
+        .prescription-card {
+            border-radius: var(--radius-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: var(--space-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .prescription-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .prescription-header {
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--secondary-color);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prescription-body {
+            padding: var(--space-md);
+            flex-grow: 1;
+        }
+
+        .prescription-date {
+            font-size: 0.9rem;
+            color: var(--muted-color);
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+        }
+
+        .prescription-date i {
+            margin-right: var(--space-xs);
+        }
+
+        .prescription-image {
+            margin-top: var(--space-md);
+            text-align: center;
+        }
+
+        .prescription-image img {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--card-border);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .prescription-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        #prescriptions-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        @media (max-width: 768px) {
+            #prescriptions-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="../JS/dark-mode.js" defer></script>
+</head>
+
+<body>
+    <header class="main-header">
+        <nav class="container nav-container">
+            <a href="dashboard.html" class="logo">MediAssist</a>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="../process/logout_process.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <button id="dark-mode-toggle" class="dark-mode-button" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+            </ul>
+            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div id="mobile-menu" class="mobile-nav">
+        <button id="close-menu" class="close-menu" aria-label="Close menu">&times;</button>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="../process/logout_process.php">Logout</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="content-header">
+                <h1><i class="fas fa-file-prescription"></i> My Prescriptions</h1>
+                <button id="add-prescription-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add
+                    Prescription</button>
+            </div>
+
+            <div id="prescription-form-container" class="card form-container" style="display:none;">
+                <div id="prescription-success-msg" class="alert alert-success" style="display:none;"></div>
+                <h2 id="prescription-form-title"><i class="fas fa-plus-circle"></i> Add New Prescription</h2>
+                <form id="prescription-form" action="../process/prescription_process.php" method="post"
+                    enctype="multipart/form-data" class="ajax-form">
+                    <input type="hidden" id="prescription_id" name="prescription_id">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                    <div class="form-group">
+                        <label for="doctor_name">Doctor Name</label>
+                        <input type="text" id="doctor_name" name="doctor_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="issue_date">Date Prescribed</label>
+                        <input type="date" id="issue_date" name="issue_date" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" class="form-control" rows="4"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="prescription_image">Upload Prescription Image</label>
+                        <input type="file" id="prescription_image" name="prescription_image" class="form-control"
+                            accept="image/*">
+                        <div id="image-preview" class="mt-sm" style="display:none;">
+                            <img src="" alt="Image Preview" style="max-width:100%; max-height:200px;">
+                        </div>
+                    </div>
+                    <div id="prescription-form-error" class="alert alert-danger" style="display:none;"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save
+                            Prescription</button>
+                        <button type="button" id="cancel-prescription-btn" class="btn btn-outline"><i
+                                class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="dashboard-section">
+                <h2><i class="fas fa-list"></i> My Saved Prescriptions</h2>
+                <div id="prescriptions-list">
+                    <!-- Prescriptions will be loaded here -->
+                </div>
+                <div id="no-prescriptions" class="text-center muted-color"
+                    style="display:none; padding:var(--space-md);">
+                    <i class="fas fa-info-circle fa-2x"></i>
+                    <p>No prescriptions added yet.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> MediAssist. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="../JS/script.js"></script>
+    <script>
+        // Update current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Toggle Prescription Form Visibility
+        document.getElementById('add-prescription-btn').addEventListener('click', () => {
+            document.getElementById('prescription-form-container').style.display = 'block';
+        });
+        document.getElementById('cancel-prescription-btn').addEventListener('click', () => {
+            document.getElementById('prescription-form-container').style.display = 'none';
+        });
+
+        // Image preview functionality
+        document.getElementById('prescription_image').addEventListener('change', function (e) {
+            const preview = document.getElementById('image-preview');
+            const previewImg = preview.querySelector('img');
+
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+
+        // Load Prescriptions List
+        async function loadPrescriptions() {
+            const container = document.getElementById('prescriptions-list');
+            const noPrescriptions = document.getElementById('no-prescriptions');
+            container.innerHTML = ''; // Clear current list
+            noPrescriptions.style.display = 'none';
+
+            try {
+                // Replace with your actual endpoint to fetch prescriptions
+                let response = await fetch('../process/prescription_process.php');
+                let data = await response.json();
+
+                if (data.success && data.prescriptions && data.prescriptions.length > 0) {
+                    data.prescriptions.forEach(prescription => {
+                        // Format date for display
+                        const prescDate = new Date(prescription.issue_date);
+                        const formattedDate = prescDate.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+
+                        container.innerHTML += `
+                            <div class="prescription-card">
+                                <div class="prescription-header">
+                                    <h3>Dr. ${prescription.doctor_name}</h3>
+                                    <span><i class="fas fa-user-md"></i></span>
+                                </div>
+                                <div class="prescription-body">
+                                    <div class="prescription-date">
+                                        <i class="fas fa-calendar-alt"></i> ${formattedDate}
+                                    </div>
+                                    <p>${prescription.notes || 'No additional notes'}</p>
+                                    ${prescription.image_path ? `
+                                        <div class="prescription-image">
+                                            <img src="${prescription.image_path}" alt="Prescription Image" 
+                                                onclick="window.open('${prescription.image_path}', '_blank')">
+                                            <div class="mt-sm">
+                                                <a href="${prescription.image_path}" class="btn btn-sm btn-outline" target="_blank">
+                                                    <i class="fas fa-external-link-alt"></i> View Full Image
+                                                </a>
+                                            </div>
+                                        </div>
+                                    ` : '<p class="muted-text"><i class="fas fa-info-circle"></i> No image attached</p>'}
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    noPrescriptions.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Error loading prescriptions:', e);
+                noPrescriptions.textContent = 'Error loading prescriptions.';
+                noPrescriptions.style.display = 'block';
+            }
+        }
+
+        // Call loadPrescriptions on page load
+        document.addEventListener('DOMContentLoaded', loadPrescriptions);
+
+        // Prescription Form Submission
+        document.getElementById('prescription-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const msgDiv = document.getElementById('prescription-success-msg');
+            const errorDiv = document.getElementById('prescription-form-error');
+            msgDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data && data.success) {
+                    msgDiv.textContent = "Prescription added successfully!";
+                    msgDiv.style.display = 'block';
+                    msgDiv.className = 'alert alert-success';
+                    form.reset();
+                    document.getElementById('image-preview').style.display = 'none';
+                    loadPrescriptions(); // Reload list
+                    // Hide form after successful submission
+                    setTimeout(() => {
+                        document.getElementById('prescription-form-container').style.display = 'none';
+                    }, 1500);
+                } else {
+                    errorDiv.textContent = data.message || "Failed to add prescription.";
+                    errorDiv.style.display = 'block';
+                    errorDiv.className = 'alert alert-danger';
+                }
+            } catch (err) {
+                errorDiv.textContent = "An error occurred while adding prescription.";
+                errorDiv.style.display = 'block';
+                errorDiv.className = 'alert alert-danger';
+            }
+        });
+    </script>
+</body>
+
+</html>

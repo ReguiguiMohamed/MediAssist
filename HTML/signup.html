@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - MediAssist</title>
+    <!-- Update these meta tags -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Add a version number to force cache refresh -->
+    <link rel="stylesheet" href="../CSS/style.css?v=1.1">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-image: url('../assets/bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+    </style>
+    <style>
+        .password-mismatch {
+            border-color: #dc3545 !important;
+            background-color: #fff8f8;
+        }
+
+        .password-match {
+            border-color: #28a745 !important;
+            background-color: #f8fff8;
+        }
+
+        .password-feedback,
+        .username-feedback {
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        .text-danger {
+            color: #dc3545;
+        }
+
+        .text-success {
+            color: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="logo-icon"><i class="fas fa-heartbeat"></i></div>
+        <h1>Create Account</h1>
+        <p class="subtitle">Enter your details to get started</p>
+        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+
+        <form id="signupForm" action="../process/signup_process.php" method="post">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required minlength="3" pattern="[a-zA-Z0-9_]+"
+                    title="Username can only contain letters, numbers, and underscores">
+                <div id="username-feedback" class="username-feedback"></div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required minlength="6"
+                    pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+                    title="Must contain at least one number and one uppercase and lowercase letter, and at least 6 characters">
+            </div>
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+                <div id="password-feedback" class="password-feedback"></div>
+            </div>
+            <button type="submit" class="btn" id="submitBtn">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="login.html">Login</a></p>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const passwordFeedback = document.getElementById('password-feedback');
+        const usernameFeedback = document.getElementById('username-feedback');
+        const submitBtn = document.getElementById('submitBtn');
+        const emailInput = document.getElementById('email');
+
+        const checkUsernameAvailability = async (username) => {
+            try {
+                const response = await fetch(`../process/check_username.php?username=${encodeURIComponent(username)}`);
+                const data = await response.json();
+                return data.available;
+            } catch (error) {
+                console.error('Error checking username:', error);
+                return false;
+            }
+        };
+
+        // Simplified validation
+        function validatePasswords() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (password === confirmPassword && password.length >= 6) {
+                confirmPasswordInput.classList.remove('password-mismatch');
+                confirmPasswordInput.classList.add('password-match');
+                passwordFeedback.classList.remove('text-danger');
+                passwordFeedback.classList.add('text-success');
+                passwordFeedback.textContent = 'Passwords match!';
+                return true;
+            } else {
+                confirmPasswordInput.classList.remove('password-match');
+                confirmPasswordInput.classList.add('password-mismatch');
+                passwordFeedback.classList.remove('text-success');
+                passwordFeedback.classList.add('text-danger');
+                passwordFeedback.textContent = 'Passwords do not match or too short!';
+                return false;
+            }
+        }
+
+        async function validateUsername() {
+            const username = usernameInput.value;
+            const isValid = username.length >= 3 && /^[a-zA-Z0-9_]+$/.test(username);
+            const isAvailable = await checkUsernameAvailability(username);
+
+            if (isValid && isAvailable) {
+                usernameFeedback.className = 'username-feedback text-success';
+                usernameFeedback.textContent = 'Username is available';
+                return true;
+            } else {
+                usernameFeedback.className = 'username-feedback text-danger';
+                usernameFeedback.textContent = isValid ? 'Username is already taken' : 'Username must be at least 3 characters and contain only letters, numbers, and underscores';
+                return false;
+            }
+        }
+
+        function validateEmail() {
+            return emailInput.checkValidity();
+        }
+
+        async function updateSubmitButton() {
+            const isValid = validatePasswords() && await validateUsername() && validateEmail();
+            submitBtn.disabled = !isValid;
+        }
+
+        // Add event listeners
+        usernameInput.addEventListener('input', updateSubmitButton);
+        passwordInput.addEventListener('input', updateSubmitButton);
+        confirmPasswordInput.addEventListener('input', updateSubmitButton);
+        emailInput.addEventListener('input', updateSubmitButton);
+
+        // Form submission
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!validatePasswords() || !await validateUsername() || !validateEmail()) {
+                return;
+            }
+
+            const formData = new FormData(e.target);
+            formData.delete('confirm_password');
+            const errorDiv = document.getElementById('error-message');
+
+            try {
+                const response = await fetch('../process/signup_process.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.location.href = data.redirect || 'profile.html'; // Use redirect from response or fallback
+                } else {
+                    errorDiv.textContent = data.message || 'An error occurred during signup';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorDiv.textContent = 'An unexpected error occurred. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Contacts - MediAssist</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../CSS/global_styles.css">
+    <link rel="stylesheet" href="../CSS/dark-mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Page-specific styles */
+        .contact-card {
+            border-radius: var(--radius-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: var(--space-md);
+            padding: var(--space-md);
+            display: flex;
+            align-items: center;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .contact-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .contact-icon {
+            background-color: rgba(var(--danger-rgb), 0.1);
+            color: var(--danger-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--space-md);
+            flex-shrink: 0;
+        }
+
+        .contact-icon i {
+            font-size: 1.5rem;
+        }
+
+        .contact-info {
+            flex-grow: 1;
+        }
+
+        .contact-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .contact-relationship {
+            color: var(--muted-color);
+            font-size: 0.9rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .contact-phone {
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-phone i {
+            color: var(--primary-color);
+            margin-right: var(--space-xs);
+        }
+
+        .emergency-section {
+            margin-top: var(--space-xl);
+            text-align: center;
+        }
+
+        .emergency-button {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--danger-color);
+            color: white;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(var(--danger-rgb), 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: var(--space-md);
+        }
+
+        .emergency-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(var(--danger-rgb), 0.5);
+        }
+
+        .emergency-button i {
+            font-size: 2.5rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .emergency-button span {
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .emergency-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: var(--space-xs);
+        }
+
+        .emergency-note {
+            color: var(--muted-color);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        #contacts-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        @media (max-width: 768px) {
+            #contacts-list {
+                grid-template-columns: 1fr;
+            }
+
+            .emergency-button {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="../JS/dark-mode.js" defer></script>
+</head>
+
+<body>
+    <header class="main-header">
+        <nav class="container nav-container">
+            <a href="dashboard.html" class="logo">MediAssist</a>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="../process/logout_process.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <button id="dark-mode-toggle" class="dark-mode-button" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+            </ul>
+            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div id="mobile-menu" class="mobile-nav">
+        <button id="close-menu" class="close-menu" aria-label="Close menu">&times;</button>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="../process/logout_process.php">Logout</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="content-header">
+                <h1><i class="fas fa-phone-alt"></i> Emergency Contacts</h1>
+                <button id="add-contact-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Contact</button>
+            </div>
+
+            <div id="contact-success-msg" class="alert alert-success" style="display:none;"></div>
+
+            <div id="contact-form-container" class="card form-container" style="display:none;">
+                <h2 id="contact-form-title"><i class="fas fa-plus-circle"></i> Add New Emergency Contact</h2>
+                <form id="contact-form" action="../process/emergency_contacts_process.php" method="post"
+                    class="ajax-form">
+                    <input type="hidden" id="contact_id" name="contact_id">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                    <div class="form-group">
+                        <label for="name">Contact Name</label>
+                        <input type="text" id="name" name="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" id="phone" name="phone" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="relationship">Relationship</label>
+                        <input type="text" id="relationship" name="relationship" class="form-control" required>
+                    </div>
+                    <div id="contact-form-error" class="alert alert-danger" style="display:none;"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Contact</button>
+                        <button type="button" id="cancel-contact-btn" class="btn btn-outline"><i
+                                class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="contacts-container" class="dashboard-section">
+                <h2><i class="fas fa-list"></i> Your Emergency Contacts</h2>
+                <div id="contacts-list">
+                    <!-- Contacts will be loaded here -->
+                </div>
+                <div id="no-contacts" class="text-center muted-color" style="display:none; padding:var(--space-md);">
+                    <i class="fas fa-info-circle fa-2x"></i>
+                    <p>No emergency contacts added yet.</p>
+                </div>
+            </div>
+
+            <div class="emergency-section">
+                <a href="tel:197" class="emergency-button">
+                    <i class="fas fa-ambulance"></i>
+                    <span>EMERGENCY</span>
+                    <div class="emergency-number">197</div>
+                </a>
+                <p class="emergency-note">Tap the button to call emergency services (Police - Tunisia).</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> MediAssist. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="../JS/script.js"></script>
+    <script>
+        // Update current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Toggle Contact Form
+        document.getElementById('add-contact-btn').addEventListener('click', () => {
+            document.getElementById('contact-form-container').style.display = 'block';
+        });
+        document.getElementById('cancel-contact-btn').addEventListener('click', () => {
+            document.getElementById('contact-form-container').style.display = 'none';
+        });
+
+        // Load Contacts
+        async function loadContacts() {
+            const container = document.getElementById('contacts-list');
+            const noContacts = document.getElementById('no-contacts');
+            container.innerHTML = '';
+            noContacts.style.display = 'none';
+
+            try {
+                let response = await fetch('../process/emergency_contacts_process.php');
+                let data = await response.json();
+                if (data.success && data.contacts && data.contacts.length) {
+                    data.contacts.forEach(contact => {
+                        container.innerHTML += `
+                            <div class="contact-card">
+                                <div class="contact-icon">
+                                    <i class="fas fa-user-shield"></i>
+                                </div>
+                                <div class="contact-info">
+                                    <div class="contact-name">${contact.name}</div>
+                                    <div class="contact-relationship">${contact.relationship}</div>
+                                    <div class="contact-phone">
+                                        <i class="fas fa-phone"></i>
+                                        <a href="tel:${contact.phone}">${contact.phone}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    noContacts.style.display = 'block';
+                }
+            } catch (e) {
+                console.error('Error loading contacts:', e);
+                noContacts.textContent = 'Error loading contacts.';
+                noContacts.style.display = 'block';
+            }
+        }
+
+        // Call loadContacts on page load
+        document.addEventListener('DOMContentLoaded', loadContacts);
+
+        // Contact Form Submission
+        document.getElementById('contact-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const msgDiv = document.getElementById('contact-success-msg');
+            const errorDiv = document.getElementById('contact-form-error');
+            msgDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data && data.success) {
+                    msgDiv.textContent = "Contact added successfully!";
+                    msgDiv.style.display = 'block';
+                    msgDiv.className = 'alert alert-success';
+                    form.reset();
+                    loadContacts();
+                    document.getElementById('contact-form-container').style.display = 'none';
+                    setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+                } else {
+                    errorDiv.textContent = data.message || "Failed to add contact.";
+                    errorDiv.style.display = 'block';
+                    errorDiv.className = 'alert alert-danger';
+                }
+            } catch (err) {
+                errorDiv.textContent = "An error occurred while adding contact.";
+                errorDiv.style.display = 'block';
+                errorDiv.className = 'alert alert-danger';
+            }
+        });
+    </script>
+</body>
+
+</html>

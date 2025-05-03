@@ -1,0 +1,91 @@
+/* Dark mode variables and styles */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    /* All the variables from Step 2 */
+}
+
+/* --- Styles for Dark Mode Toggle Button --- */
+#dark-mode-toggle {
+    background: none;
+    /* No background */
+    border: none;
+    /* No border */
+    cursor: pointer;
+    /* Indicate it's clickable */
+    font-size: 1.4rem;
+    /* Slightly larger icon */
+    color: var(--text-color);
+    /* Use text color variable */
+    padding: var(--space-sm);
+    /* Consistent padding */
+    border-radius: var(--radius-round);
+    /* Make it round */
+    transition: color var(--transition-fast) var(--transition-timing),
+        background-color var(--transition-fast) var(--transition-timing);
+    /* Smooth transition */
+    margin-left: var(--space-md);
+    /* Add space to the left */
+    display: flex;
+    /* Use flexbox to align icons */
+    align-items: center;
+    justify-content: center;
+}
+
+#dark-mode-toggle:hover {
+    color: var(--primary-color);
+    /* Change color on hover */
+    background-color: rgba(var(--primary-rgb), 0.1);
+    /* Subtle background on hover */
+}
+
+/* Hide the sun icon by default in light mode */
+#dark-mode-toggle .fa-sun {
+    display: none;
+}
+
+/* In dark mode, hide the moon icon and show the sun icon */
+body.dark-mode #dark-mode-toggle .fa-moon {
+    display: none;
+}
+
+body.dark-mode #dark-mode-toggle .fa-sun {
+    display: block;
+    color: var(--accent-color);
+    /* Optionally change color in dark mode */
+}
+
+#dark-mode-toggle:focus {
+    outline: none;
+    /* Remove default outline */
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.2);
+    /* Add a focus ring */
+}
+
+/* --- End of Styles for Dark Mode Toggle Button --- */
+body.dark-mode {
+    --bg-color: #121212;
+    --text-color: #e0e0e0;
+    --card-bg: #1e1e1e;
+    --card-border: #333333;
+    --header-bg: #1a1a1a;
+    --header-shadow: rgba(0, 0, 0, 0.3);
+    --primary-color: #4f8bf0;
+    --secondary-color: #ffb74d;
+    --success-color: #66bb6a;
+    --danger-color: #ef5350;
+    --muted-color: #9e9e9e;
+    --input-bg: #2d2d2d;
+    --input-border: #444444;
+    --dropdown-bg: #2d2d2d;
+    --dropdown-shadow: rgba(0, 0, 0, 0.5);
+    --notification-unread: #1a3a60;
+    --notification-border: #333333;
+    --notification-time: #aaaaaa;
+    --footer-bg: #1a1a1a;
+    --footer-text: #9e9e9e;
+    --alert-bg: #3e2723;
+    --alert-border: #5d4037;
+}
+
+/* All the element styles from Step 2 */

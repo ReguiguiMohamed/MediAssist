@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Title will be set dynamically -->
+    <title>Profile - MediAssist</title>
+    <link rel="stylesheet" href="../CSS/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background-image: url('../assets/bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-container profile-completion">
+        <!-- Heading and subtitle will be set dynamically -->
+        <h1 id="profile-heading">Profile</h1>
+        <p id="profile-subtitle" class="subtitle">Manage your personal information.</p>
+
+        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+        <div id="success-message" class="alert alert-success" style="display: none;"></div>
+
+        <form id="profileForm" action="../process/complete_profile_process.php" method="post"
+            enctype="multipart/form-data">
+
+            <!-- Hidden input for mode -->
+            <input type="hidden" id="mode" name="mode" value="edit"> <!-- Default to edit -->
+
+            <div class="form-group">
+                <label for="first_name">First Name</label>
+                <input type="text" id="first_name" name="first_name" required>
+                <button type="button" id="edit-first-name" class="btn btn-secondary">Edit</button>
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" required>
+                <button type="button" id="edit-last-name" class="btn btn-secondary">Edit</button>
+            </div>
+
+            <div class="form-group">
+                <label for="date_of_birth">Date of Birth</label>
+                <input type="date" id="date_of_birth" name="date_of_birth" required>
+            </div>
+            <div class="form-group">
+                <label>Gender</label>
+                <div class="radio-group">
+                    <input type="radio" id="male" name="gender" value="Male" required>
+                    <label for="male">Male</label>
+                    <input type="radio" id="female" name="gender" value="Female">
+                    <label for="female">Female</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="blood_group">Blood Group</label>
+                <select id="blood_group" name="blood_group">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="profile_image">Profile Picture</label>
+                <div class="image-upload-container">
+                    <img id="imagePreview" src="../assets/default-avatar.png" alt="Profile Preview"
+                        style="max-width: 150px; margin-bottom: 10px; display: none;">
+                    <input type="file" id="profile_image" name="profile_image" accept="image/*"
+                        onChange="previewImage(this)">
+                    <input type="hidden" id="profile_image_base64" name="profile_image_base64">
+                    <input type="hidden" id="existing_profile_image" name="existing_profile_image">
+                </div>
+            </div>
+
+            <div class="optional-fields">
+                <div class="form-group">
+                    <label for="weight">Weight (kg)</label>
+                    <input type="number" step="0.1" id="weight" name="weight">
+                </div>
+
+                <div class="form-group">
+                    <label for="height">Height (cm)</label>
+                    <input type="number" step="0.1" id="height" name="height">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" name="address"></textarea>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" id="submit-button" class="btn btn-primary">Update Profile</button>
+                <button type="button" id="skip-button" class="btn btn-outline"
+                    onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+                <!-- Changed skip to back -->
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Global variables to store profile data
+        let profileData = null;
+        let profileCompleted = false;
+
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    document.getElementById('profile_image_base64').value = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                // If no file selected, keep the existing or default image
+                const existingImage = document.getElementById('existing_profile_image').value;
+                preview.src = existingImage || '../assets/default-avatar.png';
+                preview.style.display = existingImage ? 'block' : 'none';
+                document.getElementById('profile_image_base64').value = ''; // Clear base64 if no file
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode') || 'edit'; // Default to edit if no mode specified
+            const form = document.getElementById('profileForm');
+            const modeInput = document.getElementById('mode');
+            const heading = document.getElementById('profile-heading');
+            const subtitle = document.getElementById('profile-subtitle');
+            const submitButton = document.getElementById('submit-button');
+            const skipButton = document.getElementById('skip-button');
+            const firstNameInput = document.getElementById('first_name');
+            const lastNameInput = document.getElementById('last_name');
+            const dobInput = document.getElementById('date_of_birth');
+            const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
+            const imagePreview = document.getElementById('imagePreview');
+            const existingImageInput = document.getElementById('existing_profile_image');
+
+            modeInput.value = mode;
+
+            if (mode === 'complete') {
+                heading.textContent = 'Complete Your Profile';
+                subtitle.textContent = 'Please provide your personal information to complete registration';
+                submitButton.textContent = 'Complete Profile';
+                skipButton.textContent = 'Skip for Now';
+                document.getElementById('edit-first-name').style.display = 'none';
+                document.getElementById('edit-last-name').style.display = 'none';
+                skipButton.onclick = () => {
+                    if (confirm('You can complete your profile later from the dashboard. Continue?')) {
+                        window.location.href = 'dashboard.html';
+                    }
+                };
+            } else {
+                heading.textContent = 'Edit Your Profile';
+                subtitle.textContent = 'Update your personal information.';
+                submitButton.textContent = 'Save Changes';
+                skipButton.textContent = 'Back to Dashboard';
+                skipButton.onclick = () => { window.location.href = 'dashboard.html'; };
+            }
+
+            // Fetch existing profile data to populate the form
+            fetch('../process/get_profile_data.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.profile) {
+                        profileData = data.profile;
+                        profileCompleted = data.profile_completed || false;
+
+                        firstNameInput.value = profileData.first_name || '';
+                        lastNameInput.value = profileData.last_name || '';
+                        dobInput.value = profileData.date_of_birth || '';
+
+                        // Check if gender is set before trying to select it
+                        if (profileData.gender) {
+                            const genderInput = document.querySelector(`input[name="gender"][value="${profileData.gender}"]`);
+                            if (genderInput) genderInput.checked = true;
+                        }
+
+                        document.getElementById('blood_group').value = profileData.blood_group || '';
+                        document.getElementById('weight').value = profileData.weight || '';
+                        document.getElementById('height').value = profileData.height || '';
+                        document.getElementById('phone').value = profileData.phone || '';
+                        document.getElementById('address').value = profileData.address || '';
+
+                        if (profileData.profile_image) {
+                            imagePreview.src = profileData.profile_image;
+                            imagePreview.style.display = 'block';
+                            existingImageInput.value = profileData.profile_image;
+                        } else {
+                            imagePreview.src = '../assets/default-avatar.png';
+                            imagePreview.style.display = 'none';
+                            existingImageInput.value = '';
+                        }
+
+                        // If in edit mode and profile is already completed, disable certain fields
+                        if (mode === 'edit' && profileCompleted) {
+                            firstNameInput.readOnly = true;
+                            lastNameInput.readOnly = true;
+                            dobInput.readOnly = true;
+
+                            // Make gender non-modifiable
+                            const genderInputs = document.querySelectorAll('input[name="gender"]');
+                            genderInputs.forEach(input => {
+                                input.disabled = true;
+                            });
+
+                            // Make blood group non-modifiable
+                            const bloodGroupSelect = document.getElementById('blood_group');
+                            bloodGroupSelect.disabled = true;
+
+                            // Add a class to visually indicate they are read-only
+                            firstNameInput.classList.add('readonly');
+                            lastNameInput.classList.add('readonly');
+                            dobInput.classList.add('readonly');
+                            bloodGroupSelect.classList.add('readonly');
+                        }
+
+                        // If profile is incomplete, force mode to 'complete' regardless of URL param
+                        if (!profileCompleted && mode !== 'complete') {
+                            window.location.replace('profile.html?mode=complete');
+                        }
+
+                    } else if (mode === 'edit') {
+                        // If trying to edit but no profile exists, redirect to complete
+                        console.log("No profile data found for editing, redirecting to complete.");
+                        window.location.replace('profile.html?mode=complete');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching profile data:', error);
+                    errorDiv.textContent = 'Could not load profile data. Please try again later.';
+                    errorDiv.style.display = 'block';
+                });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+
+                const formData = new FormData(form);
+
+                // Remove the actual file input since we're using base64
+                if (formData.get('profile_image').size === 0) {
+                    formData.delete('profile_image');
+                }
+
+                // In edit mode with completed profile, ensure we're not changing the read-only fields
+                if (mode === 'edit' && profileCompleted && profileData) {
+                    // These values will be ignored by the backend anyway, but let's ensure
+                    // we're sending the original values
+                    formData.set('first_name', profileData.first_name || '');
+                    formData.set('last_name', profileData.last_name || '');
+                    formData.set('date_of_birth', profileData.date_of_birth || '');
+                    formData.set('gender', profileData.gender || '');
+                    formData.set('blood_group', profileData.blood_group || '');
+                }
+
+                try {
+                    const response = await fetch('../process/complete_profile_process.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        successDiv.textContent = data.message || 'Profile updated successfully!';
+                        successDiv.style.display = 'block';
+                        // Update the existing image hidden input in case it was newly uploaded
+                        if (formData.get('profile_image_base64')) {
+                            existingImageInput.value = formData.get('profile_image_base64');
+                        }
+                        // Optionally redirect after a short delay
+                        setTimeout(() => {
+                            // Redirect only on successful completion, stay on page for edits
+                            if (mode === 'complete' || data.redirect) {
+                                window.location.href = data.redirect || 'dashboard.html';
+                            }
+                        }, 1500);
+                    } else {
+                        errorDiv.textContent = data.message || 'An error occurred.';
+                        errorDiv.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Fetch Error:', error);
+                    errorDiv.textContent = 'An unexpected error occurred. Please try again.';
+                    errorDiv.style.display = 'block';
+                }
+            });
+
+            // Unlock first name
+            document.getElementById('edit-first-name').addEventListener('click', function () {
+                const input = document.getElementById('first_name');
+                input.readOnly = false;
+                input.focus();
+                this.style.display = 'none';
+            });
+
+            // Unlock last name
+            document.getElementById('edit-last-name').addEventListener('click', function () {
+                const input = document.getElementById('last_name');
+                input.readOnly = false;
+                input.focus();
+                this.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+
+</html>

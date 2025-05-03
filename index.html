@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediAssist - Your Personal Healthcare Companion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="CSS/improved_style.css">
+</head>
+
+<body>
+
+    <header class="main-header">
+        <nav class="container nav-container">
+            <a href="#" class="logo">MediAssist</a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#testimonials">Testimonials</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="HTML/login.html" class="btn btn-outline">Login</a>
+                <a href="HTML/signup.html" class="btn btn-primary">Sign Up</a>
+                <button id="dark-mode-toggle" class="dark-mode-button" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+            </div>
+            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div id="mobile-menu" class="mobile-nav">
+        <button id="close-menu" class="close-menu" aria-label="Close menu">&times;</button>
+        <ul>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#testimonials">Testimonials</a></li>
+            <li><a href="HTML/login.html">Login</a></li>
+            <li><a href="HTML/signup.html">Sign Up</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <section class="hero-section">
+            <div class="container hero-content">
+                <h1>Welcome to MediAssist</h1>
+                <p class="hero-subtitle">Simplify your health journey. Manage medications, track records, and schedule
+                    appointments all in one secure place.</p>
+                <p class="hero-description">Take control of your well-being with an intuitive platform designed for you
+                    and your family.</p>
+                <div class="cta-buttons">
+                    <a href="HTML/signup.html" class="btn btn-primary btn-large">Get Started</a>
+                    <a href="HTML/login.html" class="btn btn-outline btn-large">Login</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features-section section-padding reveal">
+            <div class="container">
+                <h2 class="section-title">Your Health, Organized</h2>
+                <p class="section-subtitle">Everything you need to manage your healthcare effectively.</p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-pills"></i></div>
+                        <h3>Medication Management</h3>
+                        <p>Set reminders, track dosages, and manage prescriptions easily. Never miss a dose again.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-file-medical"></i></div>
+                        <h3>Centralized Health Records</h3>
+                        <p>Securely store and access your medical history, test results, and important documents
+                            anytime.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                        <h3>Effortless Appointments</h3>
+                        <p>Schedule, manage, and receive reminders for doctor visits and consultations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-notes-medical"></i></div>
+                        <h3>Symptom Tracking</h3>
+                        <p>Log symptoms and monitor your health trends to share valuable information with your doctor.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Secure & Private</h3>
+                        <p>Your health data is protected with top-tier security measures and remains confidential.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <h3>Accessible Anywhere</h3>
+                        <p>Access your MediAssist account on any device, keeping your health info at your fingertips.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="how-it-works-section section-padding bg-light reveal">
+            <div class="container">
+                <h2 class="section-title">Simple Steps to Better Health Management</h2>
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                        <h3>Sign Up</h3>
+                        <p>Create your secure MediAssist account in minutes.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-icon"><i class="fas fa-notes-medical"></i></div>
+                        <h3>Add Your Info</h3>
+                        <p>Enter your medications, medical history, and upcoming appointments.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-icon"><i class="fas fa-bell"></i></div>
+                        <h3>Stay Organized</h3>
+                        <p>Receive reminders and manage your health tasks effortlessly.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="testimonials" class="testimonials-section section-padding reveal">
+            <div class="container">
+                <h2 class="section-title">What Our Users Say</h2>
+                <div class="testimonials-grid">
+                    <div class="testimonial-card">
+                        <blockquote>
+                            <p>"MediAssist has been a lifesaver! I can finally keep track of all my medications and
+                                appointments without feeling overwhelmed."</p>
+                        </blockquote>
+                        <cite>- Firas TaK.</cite>
+                    </div>
+                    <div class="testimonial-card">
+                        <blockquote>
+                            <p>"Managing my family's health records used to be a nightmare. Now, everything is organized
+                                and accessible in one place. Highly recommend!"</p>
+                        </blockquote>
+                        <cite>- Lahwel L.</cite>
+                    </div>
+                    <div class="testimonial-card">
+                        <blockquote>
+                            <p>"The appointment reminders are fantastic. It's simple, secure, and gives me peace of mind
+                                about my health."</p>
+                        </blockquote>
+                        <cite>- Yassine S.</cite>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="credentials" class="credentials-section section-padding reveal bg-light">
+            <div class="container">
+                <h2 class="section-title">Credentials & Achievements</h2>
+                <p class="section-subtitle">Highlighting our qualifications and recognition in the field.</p>
+                <div class="credentials-grid">
+                    <div class="credential-card">
+                        <div class="credential-icon"><i class="fas fa-award"></i></div>
+                        <h3>Dr. Chadi Bali's 25 Years of Expertise</h3>
+                        <p>Recognized for 25 years of experience in reconstructive surgery, specializing in liposuction
+                            and rhinoplasty, achieved by 2025.</p>
+                    </div>
+                    <div class="credential-card">
+                        <div class="credential-icon"><i class="fas fa-certificate"></i></div>
+                        <h3>Dr. Nedra Sliti's Dermatology Mastery</h3>
+                        <p>Awarded for 17 years of expertise in cosmetic dermatology and laser surgery, certified by
+                            Tunisian Dermatology Society, 2024.</p>
+                    </div>
+                    <div class="credential-card">
+                        <div class="credential-icon"><i class="fas fa-medal"></i></div>
+                        <h3>Dr. Sofiene Ayadi's Bariatric Innovation</h3>
+                        <p>Honored for 20 years of pioneering bariatric surgery techniques, recognized by Tunisian
+                            medical community, 2023.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="cta-section section-padding bg-primary-gradient reveal">
+            <div class="container text-center">
+                <h2 class="section-title light-text">Ready to Take Control of Your Health?</h2>
+                <p class="light-text">Join thousands of users simplifying their healthcare management with MediAssist.
+                </p>
+                <a href="HTML/signup.html" class="btn btn-light btn-large">Sign Up</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> MediAssist. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="JS/script.js"></script>
+    <script>
+        // Basic functionality from original script retained
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+
+            const menuToggle = document.getElementById('menu-toggle');
+            const closeMenu = document.getElementById('close-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const navLinksMobile = mobileMenu?.querySelectorAll('a'); // Added null check
+
+            if (menuToggle && closeMenu && mobileMenu) {
+                menuToggle.addEventListener('click', () => {
+                    mobileMenu.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+
+                closeMenu.addEventListener('click', () => {
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                });
+
+                navLinksMobile?.forEach(link => { // Added null check
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.remove('active');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            // Function to apply theme
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            };
+
+            // Initial theme check
+            if (savedTheme) {
+                applyTheme(savedTheme);
+            } else {
+                applyTheme(prefersDark ? 'dark' : 'light');
+            }
+
+
+            darkModeToggle?.addEventListener('click', () => { // Added null check
+                const isDarkMode = document.body.classList.toggle('dark-mode');
+                const newTheme = isDarkMode ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme); // Apply theme immediately
+            });
+
+            // Simplified Reveal animations using Intersection Observer
+            const revealElements = document.querySelectorAll('.reveal');
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('active');
+                            observer.unobserve(entry.target); // Optional: stop observing once revealed
+                        }
+                    });
+                }, { threshold: 0.1 });
+                revealElements.forEach(el => observer.observe(el));
+            } else {
+                // Fallback for browsers without Intersection Observer (less performant)
+                const checkReveal = () => {
+                    const windowHeight = window.innerHeight;
+                    revealElements.forEach(el => {
+                        const elementTop = el.getBoundingClientRect().top;
+                        if (elementTop < windowHeight - 50) { // Reveal when 50px into view
+                            el.classList.add('active');
+                        }
+                    });
+                };
+                window.addEventListener('scroll', checkReveal);
+                checkReveal(); // Initial check
+            }
+        });
+    </script>
+</body>
+
+</html>

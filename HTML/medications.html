@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medications - MediAssist</title>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../CSS/global_styles.css">
+    <link rel="stylesheet" href="../CSS/dark-mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Page-specific styles */
+        .medication-card {
+            border-radius: var(--radius-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            overflow: hidden;
+        }
+
+        .medication-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .medication-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .medication-body {
+            padding: var(--space-md);
+        }
+
+        .medication-time {
+            display: inline-block;
+            padding: 4px 8px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            margin-top: var(--space-sm);
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        #medications-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        @media (max-width: 768px) {
+            #medications-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="../JS/dark-mode.js" defer></script>
+</head>
+
+<body id="medications-page-identifier">
+    <header class="main-header">
+        <nav class="container nav-container">
+            <a href="dashboard.html" class="logo">MediAssist</a>
+            <ul class="nav-links">
+                <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+                <li><a href="../process/logout_process.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <button id="dark-mode-toggle" class="dark-mode-button" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+            </ul>
+            <button id="menu-toggle" class="menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </nav>
+    </header>
+
+    <div id="mobile-menu" class="mobile-nav">
+        <button id="close-menu" class="close-menu" aria-label="Close menu">&times;</button>
+        <ul>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="../process/logout_process.php">Logout</a></li>
+        </ul>
+    </div>
+
+    <main>
+        <div class="container">
+            <div class="content-header">
+                <h1><i class="fas fa-pills"></i> My Medications</h1>
+                <button id="add-med-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Add Medication</button>
+            </div>
+
+            <div id="med-form-container" class="card form-container" style="display: none;">
+                <div id="med-success-msg" class="alert alert-success" style="display:none;"></div>
+                <h2 id="form-title"><i class="fas fa-plus-circle"></i> Add New Medication</h2>
+                <form id="medication-form" action="../process/medications_process.php" method="post"
+                    enctype="multipart/form-data" class="ajax-form">
+                    <input type="hidden" id="med_id" name="med_id">
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+                    <div class="form-group">
+                        <label for="med_name">Medication Name</label>
+                        <input type="text" id="med_name" name="med_name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dosage">Dosage</label>
+                        <input type="text" id="dosage" name="dosage" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="frequency_number">Frequency</label>
+                        <div style="display: flex; gap: var(--space-sm);">
+                            <select id="frequency_number" name="frequency_number" class="form-control" required>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                            <select id="frequency_period" name="frequency_period" class="form-control" required>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="start_date">Start Date</label>
+                        <input type="date" id="start_date" name="start_date" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="end_date">End Date</label>
+                        <input type="date" id="end_date" name="end_date" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="time_of_day">Time of Day</label>
+                        <input type="time" id="time_of_day" name="time_of_day" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="med_image">Medication Image</label>
+                        <input type="file" id="med_image" name="med_image" class="form-control" accept="image/*">
+                    </div>
+                    <div id="form-error" class="alert alert-danger" style="display: none;"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save
+                            Medication</button>
+                        <button type="button" id="cancel-med-btn" class="btn btn-outline"><i class="fas fa-times"></i>
+                            Cancel</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="dashboard-section">
+                <h2><i class="fas fa-list"></i> Current Medications</h2>
+                <div id="medications-list">
+                    <!-- Medications will be loaded here -->
+                </div>
+                <div id="no-medications" class="text-center muted-color" style="display:none; padding:var(--space-md);">
+                    <i class="fas fa-info-circle fa-2x"></i>
+                    <p>No medications added yet.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <p>&copy; <span id="current-year"></span> MediAssist. All rights reserved.</p>
+            <ul class="footer-links">
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms of Service</a></li>
+                <li><a href="#">Contact Us</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="../JS/script.js"></script>
+    <script>
+        // Update current year in footer
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        // Show/Hide Medication Form
+        document.getElementById('add-med-btn').addEventListener('click', () => {
+            document.getElementById('med-form-container').style.display = 'block';
+        });
+        document.getElementById('cancel-med-btn').addEventListener('click', () => {
+            document.getElementById('med-form-container').style.display = 'none';
+        });
+
+        // Medication Form Submission
+        document.getElementById('medication-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Validate end date if provided
+            const endDateInput = document.getElementById('end_date');
+            const formError = document.getElementById('form-error');
+            formError.style.display = 'none';
+
+            if (endDateInput.value) {
+                const endDate = new Date(endDateInput.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Set to beginning of day for fair comparison
+
+                if (endDate < today) {
+                    formError.textContent = "End date cannot be in the past. Please select today or a future date.";
+                    formError.style.display = 'block';
+                    return;
+                }
+            }
+
+            // Combine frequency fields into one value
+            const freqNum = document.getElementById('frequency_number').value;
+            const freqPeriod = document.getElementById('frequency_period').value;
+            let freqInput = document.getElementById('frequency');
+            if (!freqInput) {
+                freqInput = document.createElement('input');
+                freqInput.type = 'hidden';
+                freqInput.name = 'frequency';
+                freqInput.id = 'frequency';
+                e.target.appendChild(freqInput);
+            }
+            freqInput.value = freqNum + ' ' + freqPeriod;
+
+            const form = e.target;
+            const formData = new FormData(form);
+            const msgDiv = document.getElementById('med-success-msg');
+            msgDiv.style.display = 'none';
+            msgDiv.className = 'alert alert-success';
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data && data.success) {
+                    msgDiv.textContent = "Medication added successfully!";
+                    msgDiv.style.display = 'block';
+                    msgDiv.className = 'alert alert-success';
+                    form.reset();
+                    if (typeof loadMedications === 'function') loadMedications(); // Assuming this function exists to refresh list
+                } else {
+                    formError.textContent = data.message || "Failed to add medication."; // Use error div
+                    formError.style.display = 'block';
+                    formError.className = 'alert alert-danger'; // Ensure correct class
+                }
+            } catch (err) {
+                formError.textContent = "An error occurred while adding medication."; // Use error div
+                formError.style.display = 'block';
+                formError.className = 'alert alert-danger'; // Ensure correct class
+            }
+        });
+
+        // Function to load medications
+        async function loadMedications() {
+            const container = document.getElementById('medications-list');
+            const noMedications = document.getElementById('no-medications');
+            container.innerHTML = ''; // Clear current list
+            noMedications.style.display = 'none';
+
+            try {
+                // Replace with your actual endpoint to fetch medications
+                let response = await fetch('../process/medications_process.php');
+                let data = await response.json();
+
+                if (data.success && data.medications && data.medications.length > 0) {
+                    data.medications.forEach(med => {
+                        container.innerHTML += `
+                            <div class="medication-card">
+                                <div class="medication-header">
+                                    <h3>${med.med_name}</h3>
+                                    <span>${med.dosage}</span>
+                                </div>
+                                <div class="medication-body">
+                                    <p><i class="fas fa-sync-alt"></i> Frequency: ${med.frequency}</p>
+                                    <p><i class="fas fa-calendar-alt"></i> Dates: ${med.start_date} to ${med.end_date || 'Ongoing'}</p>
+                                    <div class="medication-time">
+                                        <i class="fas fa-clock"></i> ${med.time_of_day}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    noMedications.style.display = 'block';
+                }
+            } catch (e) {
+                noMedications.textContent = 'Error loading medications.';
+                noMedications.style.display = 'block';
+            }
+        }
+
+        // Call loadMedications on page load
+        document.addEventListener('DOMContentLoaded', loadMedications);
+    </script>
+</body>
+
+</html>
